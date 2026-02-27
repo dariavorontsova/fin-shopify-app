@@ -69,11 +69,28 @@ Currently: customer clicks a question → messenger opens with text pre-filled �
 - **No fallback** — if Intercom isn't installed, the block does nothing on click.
 - **No analytics** — no tracking of clicks or conversions.
 
-## Getting started
+## How we built it — dev environment setup
+
+This is all standard Shopify infrastructure. Nothing hacked together — it's the official way to build Shopify apps.
+
+**What you need (all free):**
+
+1. **[Shopify Partner account](https://partners.shopify.com/)** — free, anyone can create one. This is where you manage apps.
+2. **[Dev store](https://shopify.dev/docs/apps/build/dev-dashboard/development-stores)** — free test store created from the Partner Dashboard. Ours is `darias-playground.myshopify.com`. Comes with test products, no real transactions.
+3. **[Shopify CLI](https://shopify.dev/docs/api/shopify-cli)** — `npm install -g @shopify/cli`. Handles app scaffolding, dev server, hot reload, deployment, and tunnelling to your dev store.
+4. **Intercom on the dev store** — the official [Intercom Shopify app](https://apps.shopify.com/intercom) installed on the dev store. This provides the Messenger widget (the floating bubble) and loads `window.Intercom` globally. Our app is a separate app that coexists with it.
+
+**How it all fits together:**
+
+- `shopify app init` scaffolded the project structure
+- `shopify app generate extension` created the theme app extension (the `extensions/ask-fin/` folder)
+- `shopify app dev` runs a dev server that tunnels the extension to the dev store with hot reload
+- `shopify app deploy` pushes the extension to Shopify's CDN
+- The merchant adds the block to their product page via the theme editor — [standard app block workflow](https://shopify.dev/docs/apps/build/online-store/theme-app-extensions)
+
+**Who can replicate this:** anyone with a Shopify Partner account (free) and Node.js installed. The Shopify CLI does the heavy lifting.
 
 ```bash
 npm install
 npm run dev
 ```
-
-Requires [Shopify CLI 3.0+](https://shopify.dev/docs/api/shopify-cli) and an Intercom access token in `.env`.
