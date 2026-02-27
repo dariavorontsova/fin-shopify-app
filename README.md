@@ -12,8 +12,8 @@ A Shopify theme app extension that embeds Intercom's Fin AI shopping assistant d
 ## Tech stack — intentionally simple
 
 - **Frontend:** Shopify Theme App Extension (Liquid + vanilla JS + CSS) — no React, no build step
-- **Backend:** A lightweight Express.js server for Intercom API calls
-- **Integrations:** Intercom REST API + JS Messenger SDK, Shopify Liquid product data
+- **Integration:** Intercom JavaScript Messenger SDK (`window.Intercom`) + Shopify Liquid product data
+- **No backend needed:** The app works entirely client-side by opening the existing Intercom messenger with pre-filled messages
 
 ## Key files
 
@@ -22,7 +22,6 @@ A Shopify theme app extension that embeds Intercom's Fin AI shopping assistant d
 | `extensions/ask-fin/blocks/ask-fin-pdp.liquid` | The UI block (suggested questions, input, product context) |
 | `extensions/ask-fin/assets/ask-fin.js` | ~116 lines — opens Intercom with the question + product context |
 | `extensions/ask-fin/assets/ask-fin.css` | ~179 lines — clean, responsive styling |
-| `web/index.js` | Express server with one endpoint for conversation creation |
 
 ## Why it's low effort
 
