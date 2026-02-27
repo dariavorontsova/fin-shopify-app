@@ -1,0 +1,15 @@
+{
+  "name": "fin-shopify-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ask Fin - AI shopping assistant app block for Shopify product pages",
+  "scripts": {
+    "shopify": "shopify",
+    "dev": "shopify app dev",
+    "deploy": "shopify app deploy"
+  },
+  "dependencies": {
+    "@shopify/cli": "^3.0.0",
+    "@shopify/app": "^3.0.0"
+  }
+}

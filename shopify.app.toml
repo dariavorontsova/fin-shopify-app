@@ -1,0 +1,13 @@
+name = "Ask Fin"
+client_id = "REPLACE_WITH_YOUR_CLIENT_ID"
+application_url = "https://localhost"
+embedded = false
+
+[access_scopes]
+scopes = ""
+
+[auth]
+redirect_urls = [ "https://localhost/auth/callback" ]
+
+[webhooks]
+api_version = "2025-01"
