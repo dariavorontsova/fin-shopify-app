@@ -56,9 +56,9 @@ For a handful of stores, **custom app per store** is the fastest — no review. 
 
 Suggested questions are hardcoded and snowboard-specific. Needs an LLM call — pass product data, get contextual questions back. Simplest approach: backend endpoint with caching by product handle.
 
-### 3. Auto-sending messages (Intercom API limitation)
+### 3. Auto-sending messages
 
-Currently the customer has to hit send after the messenger opens. We tried auto-sending via the [Intercom REST API](https://developers.intercom.com/docs/references/rest-api/api.intercom.io/conversations/createconversation) but anonymous visitors are [client-side-only entities](https://www.intercom.com/help/en/articles/310-how-do-visitors-leads-and-users-work-in-intercom) — the API needs a contact ID that doesn't exist yet. This is a [known limitation](https://community.intercom.com/api-webhooks-23/creating-a-conversation-from-a-visitor-returning-an-error-lead-not-found-2870). `showNewMessage` (pre-fill, user clicks send) is the best available option.
+Currently the customer has to hit send after the messenger opens. We tried auto-sending via the [Intercom REST API](https://developers.intercom.com/docs/references/rest-api/api.intercom.io/conversations/createconversation) but hit [visitor identity issues](https://community.intercom.com/api-webhooks-23/creating-a-conversation-from-a-visitor-returning-an-error-lead-not-found-2870) — the public API needs a contact ID that doesn't exist for anonymous visitors yet. This is solvable with Intercom engineering involvement (e.g. internal APIs, or a `sendMessage`-style JS method). Another option worth exploring: **bundling this as part of the official Intercom Shopify app** rather than a standalone app, which would give direct access to the Messenger internals and simplify distribution (no separate Shopify review needed).
 
 ### 4. Other gaps
 
