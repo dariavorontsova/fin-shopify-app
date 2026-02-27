@@ -49,8 +49,9 @@ npm run dev
 | **[Custom app](https://shopify.dev/docs/apps/build/custom-apps)** | One specific store | None | Minimal |
 | **[Unlisted app](https://shopify.dev/docs/apps/launch/distribution)** | Anyone with a direct link | Full Shopify review | See below |
 | **[Listed app](https://shopify.dev/docs/apps/launch/shopify-app-store)** | Anyone via App Store | Full review + listing content | Same + screenshots, screencast |
+| **Bundle into Intercom's Shopify app** | All Intercom+Shopify customers | None (already approved) | Intercom eng involvement |
 
-For a handful of stores, **custom app per store** is the fastest — no review. For broader distribution, the app needs to pass [Shopify's review](https://shopify.dev/docs/apps/launch/app-store-review/review-process) (GDPR webhooks, admin page, security headers, perf). Budget **3-4 weeks**.
+For a handful of stores, **custom app per store** is the fastest — no review. For broader distribution as a standalone app, it needs to pass [Shopify's review](https://shopify.dev/docs/apps/launch/app-store-review/review-process) (GDPR webhooks, admin page, security headers, perf) — budget **3-4 weeks**. The best long-term option is likely **bundling into the existing Intercom Shopify app** — it's already approved, already installed on merchant stores, and would also solve the auto-send problem (direct access to Messenger internals).
 
 ### 2. Smart question generation (currently hardcoded)
 
