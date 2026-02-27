@@ -42,52 +42,32 @@ A Shopify theme app extension that embeds Intercom's Fin AI shopping assistant d
 
 ## What's missing to launch
 
-### 1. Shopify App Store review (~3-4 weeks)
+### 1. Distribution — how to get this on other stores
 
-To publish on the Shopify App Store the app needs to pass review. Key gaps:
+| Method | Who can install? | Review needed? | Effort |
+|---|---|---|---|
+| **Dev store** (current) | Only your dev store | None | Already done |
+| **[Custom app](https://shopify.dev/docs/apps/build/custom-apps)** | One specific store | None | Minimal — create via that store's admin |
+| **[Unlisted app](https://shopify.dev/docs/apps/launch/distribution)** | Anyone with a direct link | Full Shopify review | See below |
+| **[Listed app](https://shopify.dev/docs/apps/launch/shopify-app-store)** | Anyone via App Store | Full review + listing content | Same as unlisted + screenshots, screencast |
 
-- **GDPR webhooks** — mandatory even if we don't store customer data. Need endpoints for Customer Data Request, Customer Redact, and Shop Redact.
-- **Embedded admin page** — even a minimal one. Reviewers expect a functioning app UI in the Shopify admin after install.
-- **Demo screencast** — required for submission. Must show setup flow and core features.
-- **Lighthouse performance** — theme extension must not degrade store performance by more than 10 points.
-- **Security headers** — anti-clickjacking headers for the embedded admin (most common rejection reason).
-
-Timeline is officially 5-10 business days but realistically **3-4 weeks** with 1-2 rounds of feedback. Current backlog (early 2026) is reportedly longer.
-
-An alternative: ship as an **unlisted app** (same review requirements but no App Store listing review, distributed via direct link). Same effort but avoids the listing content prep.
+For a handful of stores, **custom app per store** is the fastest — no review. For broader distribution (unlisted or listed), the app needs to pass [Shopify's review](https://shopify.dev/docs/apps/launch/app-store-review/review-process): GDPR webhooks, embedded admin page, security headers, Lighthouse performance under 10pt degradation. Budget **3-4 weeks** for review with 1-2 rounds of feedback.
 
 ### 2. Smart question generation (currently hardcoded)
 
-Right now the suggested questions are 10 hardcoded strings, some snowboard-specific ("Does this come with bindings?", "What terrain is this best for?"). This obviously won't work for a clothing store or electronics shop.
+The suggested questions are 10 hardcoded strings, some snowboard-specific ("Does this come with bindings?"). Won't work for other stores. Needs an LLM call — pass product data, get contextual questions back. Simplest approach: backend endpoint with caching by product handle. This means adding a backend + LLM API dependency.
 
-**What's needed:** pass the product URL or product data (title, type, description) to an LLM and get back 3-4 contextual questions. Two approaches:
+### 3. Auto-sending messages (Intercom API limitation)
 
-- **On page load** — JS calls a backend endpoint that hits an LLM. Simple but adds latency and cost per page view. Could cache by product handle.
-- **At sync time** — generate questions when products are synced/updated and store them. No page-load latency but needs a data store and sync mechanism.
+Currently: customer clicks a question → messenger opens with text pre-filled → customer hits send. We tried to auto-send via the [Intercom REST API](https://developers.intercom.com/docs/references/rest-api/api.intercom.io/conversations/createconversation) but it doesn't work for anonymous visitors.
 
-Either way this means **adding a backend** (which we currently don't need) and an LLM API dependency. The on-page-load approach with caching is probably the simplest starting point.
-
-### 3. Auto-sending messages (the Intercom REST API problem)
-
-Currently the customer clicks a question → Intercom messenger opens with text pre-filled → customer has to hit send. We tried to auto-send via Intercom's REST API but it didn't work. Here's why:
-
-**The core issue: anonymous visitors don't exist server-side.** Intercom's data model has three tiers: visitors → leads → users. Visitors are **client-side-only entities** — their identity lives in browser cookies managed by the Messenger widget. They don't become "contacts" (leads) until they actually engage with the Messenger.
-
-The REST API's Create Conversation endpoint (`POST /conversations`) requires a `from.id` referencing a contact that already exists in Intercom. But for a first-time visitor, there is no contact record yet. We tried:
-
-- Looking up visitors via `GET /visitors?user_id=` → inconsistent, often returns nothing
-- Using the visitor ID from `Intercom('getVisitorId')` on the client → passing to backend → "Lead Not Found" errors
-- The documented auto-conversion (visitor → lead on conversation creation) simply doesn't work reliably
-
-This is a known Intercom limitation with open community threads and no resolution. The Messenger JS SDK works because it **owns the visitor identity** and handles the visitor-to-lead conversion atomically when a message is sent. The REST API can't replicate this.
-
-**What would fix it:** Intercom would need to expose a client-side JS method like `Intercom('sendMessage', text)` that sends without requiring the user to click. This doesn't exist today. The current `showNewMessage` is the best available option.
+**Why:** Intercom's [visitor → lead → user model](https://www.intercom.com/help/en/articles/310-how-do-visitors-leads-and-users-work-in-intercom) means anonymous visitors are client-side-only (cookie-based). The REST API's `POST /conversations` needs a pre-existing contact ID, but visitors don't have one until they engage with the Messenger. We hit "Lead Not Found" errors consistently — this is a [known limitation](https://community.intercom.com/api-webhooks-23/creating-a-conversation-from-a-visitor-returning-an-error-lead-not-found-2870). The JS SDK works because it owns the visitor identity and handles conversion atomically. There's no `Intercom('sendMessage')` method today — `showNewMessage` (pre-fill, user clicks send) is the best option.
 
 ### 4. Other production gaps
 
-- **Dead backend code** — `web/index.js` has the REST API attempt that doesn't work. Should be removed or repurposed for the LLM question generation.
-- **No graceful fallback** — if Intercom isn't installed on the store, the block shows questions that do nothing on click. Should show a warning or hide itself.
-- **No analytics** — no tracking of question clicks, form submissions, or conversion to conversations.
+- **Dead backend code** — `web/index.js` has the failed REST API attempt. Remove or repurpose for LLM question generation.
+- **No fallback** — if Intercom isn't installed, the block does nothing on click.
+- **No analytics** — no tracking of clicks or conversions.
 
 ## Getting started
 
